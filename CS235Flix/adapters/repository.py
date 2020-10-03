@@ -2,7 +2,10 @@ import abc
 from typing import List
 from datetime import date
 
-from CS235Flix.domaincovidfiles.model import User, Article, Tag, Comment
+from covid.domain.model import User, Article, Tag, Comment
+
+
+repo_instance = None
 
 
 class RepositoryException(Exception):

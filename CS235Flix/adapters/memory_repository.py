@@ -7,8 +7,14 @@ from bisect import bisect, bisect_left, insort_left
 
 from werkzeug.security import generate_password_hash
 
-from CS235Flix.domaincovidfiles.repository import AbstractRepository, RepositoryException
-from CS235Flix.domaincovidfiles.model import Article, Tag, User, Comment, make_tag_association, make_comment
+from CS235Flix.adapters.repository import AbstractRepository, RepositoryException
+from CS235Flix.domainmodel.actor import Actor
+from CS235Flix.domainmodel.director import Director
+from CS235Flix.domainmodel.genre import Genre
+from CS235Flix.domainmodel.movie import Movie
+from CS235Flix.domainmodel.review import Review
+from CS235Flix.domainmodel.user import User
+from CS235Flix.domainmodel.watchlist import Watchlist
 
 
 class MemoryRepository(AbstractRepository):
@@ -136,7 +142,6 @@ class MemoryRepository(AbstractRepository):
         self._tags.append(tag)
 
     def get_tags(self) -> List[Tag]:
-        print('In memory repo, getting tags!')
         return self._tags
 
     def add_comment(self, comment: Comment):
@@ -155,7 +160,7 @@ class MemoryRepository(AbstractRepository):
 
 
 def read_csv_file(filename: str):
-    with open(filename) as infile:
+    with open(filename, encoding='utf-8-sig') as infile:
         reader = csv.reader(infile)
 
         # Read first line of the the CSV file.
@@ -171,7 +176,7 @@ def read_csv_file(filename: str):
 def load_articles_and_tags(data_path: str, repo: MemoryRepository):
     tags = dict()
 
-    for data_row in read_csv_file(os.path.join(data_path, 'news_articles.csv')):
+    for data_row in read_csv_file(os.path.join(data_path, '')):
 
         article_key = int(data_row[0])
         number_of_tags = len(data_row) - 6
@@ -182,7 +187,6 @@ def load_articles_and_tags(data_path: str, repo: MemoryRepository):
             if tag not in tags.keys():
                 tags[tag] = list()
             tags[tag].append(article_key)
-
         del data_row[-number_of_tags:]
 
         # Create Article object.
@@ -221,7 +225,7 @@ def load_users(data_path: str, repo: MemoryRepository):
 
 
 def load_comments(data_path: str, repo: MemoryRepository, users):
-    for data_row in read_csv_file(os.path.join(data_path, 'comments.csv')):
+    for data_row in read_csv_file(os.path.join(data_path, '')):
         comment = make_comment(
             comment_text=data_row[3],
             user=users[data_row[1]],
