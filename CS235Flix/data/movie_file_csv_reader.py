@@ -30,6 +30,7 @@ class MovieFileCSVReader:
                 votes = int(row["Votes"])
                 revenue = row["Revenue (Millions)"]
                 metascore = row["Metascore"]
+                rank = row["Rank"]
 
                 movie = Movie(title, release_year)
                 movie.description = description
@@ -41,6 +42,7 @@ class MovieFileCSVReader:
                 movie.votes = votes
                 movie.revenue = revenue
                 movie.metascore = metascore
+                movie.rank = rank
 
                 self.__dataset_of_directors.add(director)
                 self.__dataset_of_genres |= genres

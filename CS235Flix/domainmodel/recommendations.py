@@ -1,5 +1,5 @@
 import random
-from CS235Flix.datafilereaders.movie_file_csv_reader import MovieFileCSVReader
+from CS235Flix.data.movie_file_csv_reader import MovieFileCSVReader
 from CS235Flix.domainmodel import movie
 from CS235Flix.domainmodel.actor import Actor
 from CS235Flix.domainmodel.genre import Genre
@@ -14,8 +14,6 @@ def pick_from_actor(actor : Actor):
     valid_movie_list = [movie if actor in actors else None]
     seed = len(valid_movie_list)
     return valid_movie_list[random.randint(0, seed - 1)]
-
-
 
 def pick_from_director(director: Director):
         filename = "C:/Users/85251/Downloads/COMPSCI notes (AucklandUni)/COMPSCI 235/CS235FlixSkeleton/datafiles/Data1000Movies.csv"

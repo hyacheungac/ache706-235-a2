@@ -21,6 +21,16 @@ class Movie(object):
         self.__votes = 0
         self.__revenue = 0.0
         self.__metascore = 0
+        self.__rank = 0
+
+    @property
+    def rank(self) -> int:
+        return self.__rank
+
+    @rank.setter
+    def rank(self, rank):
+        if rank > 0:
+            self.__rank = rank
 
     @property
     def title(self) -> str:
@@ -30,6 +40,9 @@ class Movie(object):
     def title(self, title):
         if type(title) == str:
             self.__title = title.strip()
+    @property
+    def release_year(self) -> int:
+        return self.__release_year
 
     @property
     def description(self) -> str:
@@ -150,4 +163,3 @@ class Movie(object):
     def remove_genre(self, genre):
         if genre in self.__genres:
             self.__genres.remove(genre)
-

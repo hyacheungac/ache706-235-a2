@@ -7,7 +7,7 @@ class Genre:
             self.__genre_name = genre_name.strip()
 
     @property
-    def director_full_name(self) -> str:
+    def genre_name(self) -> str:
         return self.__genre_name
 
     def __repr__(self):

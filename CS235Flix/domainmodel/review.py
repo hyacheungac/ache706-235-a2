@@ -1,13 +1,18 @@
 import datetime
 
 from CS235Flix.domainmodel.movie import Movie
+from CS235Flix.domainmodel.user import User
 
 class Review:
-    def __init__(self, movie, review_text, rating):
+    def __init__(self, movie, user, review_text, rating):
         if movie and type(movie) == Movie:
             self.__movie = movie
         else:
             self.__movie = None
+        if user and type(user) == User:
+            self.__user = user
+        else:
+            self.__user = None
         if review_text and type(review_text) is str:
             self.__review_text = review_text.strip()
         else:
@@ -22,6 +27,10 @@ class Review:
     @property
     def movie(self):
         return self.__movie
+
+    @property
+    def user(self):
+        return self.__user
 
     @property
     def review_text(self):

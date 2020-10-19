@@ -4,8 +4,8 @@ import os
 
 from flask import Flask
 
-import CS235Flix.domaincovidfiles.repository as repo
-from CS235Flix.domaincovidfiles.memory_repository import MemoryRepository, populate
+import CS235Flix.adapters.repository as repo
+from CS235Flix.adapters.memory_repository import MemoryRepository, populate
 
 
 def create_app(test_config=None):

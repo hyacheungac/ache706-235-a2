@@ -8,24 +8,26 @@ from bisect import bisect, bisect_left, insort_left
 from werkzeug.security import generate_password_hash
 
 from CS235Flix.adapters.repository import AbstractRepository, RepositoryException
+from CS235Flix.domainmodel import movie
 from CS235Flix.domainmodel.actor import Actor
 from CS235Flix.domainmodel.director import Director
 from CS235Flix.domainmodel.genre import Genre
 from CS235Flix.domainmodel.movie import Movie
 from CS235Flix.domainmodel.review import Review
 from CS235Flix.domainmodel.user import User
-from CS235Flix.domainmodel.watchlist import Watchlist
+from CS235Flix.domainmodel.watchlist import WatchList
+from CS235Flix.data.movie_file_csv_reader import MovieFileCSVReader
 
 
 class MemoryRepository(AbstractRepository):
-    # Articles ordered by date, not id. id is assumed unique.
+    # movies ordered by date, not id. id is assumed unique.
 
     def __init__(self):
-        self._articles = list()
-        self._articles_index = dict()
-        self._tags = list()
+        self._movies = list()
+        self._movies_index = dict()
+        self._genres = list()
         self._users = list()
-        self._comments = list()
+        self._reviews = list()
 
     def add_user(self, user: User):
         self._users.append(user)
@@ -33,130 +35,121 @@ class MemoryRepository(AbstractRepository):
     def get_user(self, username) -> User:
         return next((user for user in self._users if user.username == username), None)
 
-    def add_article(self, article: Article):
-        insort_left(self._articles, article)
-        self._articles_index[article.id] = article
+    def add_movie(self, movie: Movie):
+        insort_left(self._movies, movie)
+        self._movies_index[movie.rank] = movie
 
-    def get_article(self, id: int) -> Article:
-        article = None
-
+    def get_movie(self, rank: int) -> Movie:
+        movie = None
         try:
-            article = self._articles_index[id]
+            movie = self._movies_index[rank]
         except KeyError:
             pass  # Ignore exception and return None.
+        return movie
 
-        return article
-
-    def get_articles_by_date(self, target_date: date) -> List[Article]:
-        target_article = Article(
-            date=target_date,
+    def get_movies_by_release_year(self, target_year: int) -> List[Movie]:
+        target_movie = Movie(
+            release_year=target_year,
             title=None,
-            first_para=None,
-            hyperlink=None,
-            image_hyperlink=None
         )
-        matching_articles = list()
-
+        matching_movies = list()
         try:
-            index = self.article_index(target_article)
-            for article in self._articles[index:None]:
-                if article.date == target_date:
-                    matching_articles.append(article)
+            index = self.movie_index(target_movie)
+            for movie in self._movies[index:None]:
+                if movie.release_year == target_year:
+                    matching_movies.append(movie)
                 else:
                     break
         except ValueError:
-            # No articles for specified date. Simply return an empty list.
+            # No movies for specified date. Simply return an empty list.
             pass
+        return matching_movies
 
-        return matching_articles
+    def get_number_of_movies(self):
+        return len(self._movies)
 
-    def get_number_of_articles(self):
-        return len(self._articles)
+    def get_first_movie(self):
+        movie = None
+        if len(self._movies) > 0:
+            movie = self._movies[0]
+        return movie
 
-    def get_first_article(self):
-        article = None
+    def get_last_movie(self):
+        movie = None
+        if len(self._movies) > 0:
+            movie = self._movies[-1]
+        return movie
 
-        if len(self._articles) > 0:
-            article = self._articles[0]
-        return article
+    def get_movies_by_rank(self, rank_list):
+        # Strip out any ranks in rank_list that don't represent movie ranks in the repository.
+        existing_ranks = [rank for rank in rank_list if rank in self._movies_index]
 
-    def get_last_article(self):
-        article = None
+        # Fetch the movies.
+        movies = [self._movies_index[rank] for rank in existing_ranks]
+        return movies
 
-        if len(self._articles) > 0:
-            article = self._articles[-1]
-        return article
+    def get_movie_ranks_by_genre(self, genre: Genre):
+        # Linear search, to find the first occurrence of a genre with the name genre.
+        genre = next((genre for genre in self._genres if genre.genre_name == genre), None)
 
-    def get_articles_by_id(self, id_list):
-        # Strip out any ids in id_list that don't represent Article ids in the repository.
-        existing_ids = [id for id in id_list if id in self._articles_index]
-
-        # Fetch the Articles.
-        articles = [self._articles_index[id] for id in existing_ids]
-        return articles
-
-    def get_article_ids_for_tag(self, tag_name: str):
-        # Linear search, to find the first occurrence of a Tag with the name tag_name.
-        tag = next((tag for tag in self._tags if tag.tag_name == tag_name), None)
-
-        # Retrieve the ids of articles associated with the Tag.
-        if tag is not None:
-            article_ids = [article.id for article in tag.tagged_articles]
+        # Retrieve the ranks of movies associated with the genre.
+        if genre is not None:
+            movie_ranks = [Movie.rank for genre in Movie.genres]
         else:
-            # No Tag with name tag_name, so return an empty list.
-            article_ids = list()
+            # No genre with name genre_name, so return an empty list.
+            movie_ranks = list()
 
-        return article_ids
+        return movie_ranks
 
-    def get_date_of_previous_article(self, article: Article):
-        previous_date = None
-
-        try:
-            index = self.article_index(article)
-            for stored_article in reversed(self._articles[0:index]):
-                if stored_article.date < article.date:
-                    previous_date = stored_article.date
-                    break
-        except ValueError:
-            # No earlier articles, so return None.
-            pass
-
-        return previous_date
-
-    def get_date_of_next_article(self, article: Article):
-        next_date = None
+    def get_title_of_previous_movie(self, movie: Movie):
+        previous_movie = None
 
         try:
-            index = self.article_index(article)
-            for stored_article in self._articles[index + 1:len(self._articles)]:
-                if stored_article.date > article.date:
-                    next_date = stored_article.date
-                    break
+            index = self.movie_index(movie)
+            previous_movie = self._movies_index[index - 1]
         except ValueError:
-            # No subsequent articles, so return None.
+            # No earlier movies, so return None.
             pass
 
-        return next_date
+        return previous_movie
 
-    def add_tag(self, tag: Tag):
-        self._tags.append(tag)
+    def get_title_of_next_movie(self, movie: Movie):
+        next_movie = None
 
-    def get_tags(self) -> List[Tag]:
-        return self._tags
+        try:
+            index = self.movie_index(movie)
+            next_movie = self._movies_index[index + 1]
+        except ValueError:
+            # No subsequent movies, so return None.
+            pass
 
-    def add_comment(self, comment: Comment):
-        super().add_comment(comment)
-        self._comments.append(comment)
+        return next_movie
 
-    def get_comments(self):
-        return self._comments
+    def add_genre(self, genre: Genre):
+        self._genres.append(genre)
 
-    # Helper method to return article index.
-    def article_index(self, article: Article):
-        index = bisect_left(self._articles, article)
-        if index != len(self._articles) and self._articles[index].date == article.date:
+    def get_genres(self) -> List[Genre]:
+        return self._genres
+
+    def add_review(self, review: Review):
+        super().add_review(review)
+        self._reviews.append(review)
+
+    def get_reviews(self):
+        return self._reviews
+
+    # Helper method to return movie index.
+    def movie_index(self, movie: Movie):
+        index = bisect_left(self._movies, movie)
+        if index != len(self._movies) and self._movies[index].release_year == movie.release_year:
             return index
         raise ValueError
+
+
+def load_movies_and_genres(data_path: str, repo: MemoryRepository):
+    for movie in MovieFileCSVReader(data_path).get_dataset_of_movies():
+        repo.add_movie(movie)
+    repo._genres = MovieFileCSVReader(data_path).get_dataset_of_genres()
 
 
 def read_csv_file(filename: str):
@@ -172,75 +165,33 @@ def read_csv_file(filename: str):
             row = [item.strip() for item in row]
             yield row
 
-
-def load_articles_and_tags(data_path: str, repo: MemoryRepository):
-    tags = dict()
-
-    for data_row in read_csv_file(os.path.join(data_path, '')):
-
-        article_key = int(data_row[0])
-        number_of_tags = len(data_row) - 6
-        article_tags = data_row[-number_of_tags:]
-
-        # Add any new tags; associate the current article with tags.
-        for tag in article_tags:
-            if tag not in tags.keys():
-                tags[tag] = list()
-            tags[tag].append(article_key)
-        del data_row[-number_of_tags:]
-
-        # Create Article object.
-        article = Article(
-            date=date.fromisoformat(data_row[1]),
-            title=data_row[2],
-            first_para=data_row[3],
-            hyperlink=data_row[4],
-            image_hyperlink=data_row[5],
-            id=article_key
-        )
-
-        # Add the Article to the repository.
-        repo.add_article(article)
-
-    # Create Tag objects, associate them with Articles and add them to the repository.
-    for tag_name in tags.keys():
-        tag = Tag(tag_name)
-        for article_id in tags[tag_name]:
-            article = repo.get_article(article_id)
-            make_tag_association(article, tag)
-        repo.add_tag(tag)
-
-
 def load_users(data_path: str, repo: MemoryRepository):
     users = dict()
 
     for data_row in read_csv_file(os.path.join(data_path, 'users.csv')):
-        user = User(
-            username=data_row[1],
-            password=generate_password_hash(data_row[2])
-        )
+        user = User(data_row[1],generate_password_hash(data_row[2]))
         repo.add_user(user)
         users[data_row[0]] = user
     return users
 
 
-def load_comments(data_path: str, repo: MemoryRepository, users):
+def load_reviews(data_path: str, repo: MemoryRepository, users):
     for data_row in read_csv_file(os.path.join(data_path, '')):
-        comment = make_comment(
-            comment_text=data_row[3],
+        review = Review(
+            review_text=data_row[3],
             user=users[data_row[1]],
-            article=repo.get_article(int(data_row[2])),
+            movie=repo.get_movie(int(data_row[2])),
             timestamp=datetime.fromisoformat(data_row[4])
         )
-        repo.add_comment(comment)
+        repo.add_review(review)
 
 
 def populate(data_path: str, repo: MemoryRepository):
-    # Load articles and tags into the repository.
-    load_articles_and_tags(data_path, repo)
+    # Load movies and genres into the repository.
+    load_movies_and_genres(data_path, repo)
 
     # Load users into the repository.
     users = load_users(data_path, repo)
 
-    # Load comments into the repository.
-    load_comments(data_path, repo, users)
+    # Load reviews into the repository.
+    load_reviews(data_path, repo, users)
