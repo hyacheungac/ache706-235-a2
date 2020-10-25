@@ -1,6 +1,14 @@
 from CS235Flix.domainmodel.actor import Actor
 
 
+def test_init():
+    actor1 = Actor("Taika Waititi")
+    assert repr(actor1) == "<Actor Taika Waititi>"
+    actor2 = Actor("")
+    assert actor2.actor_full_name is None
+    actor3 = Actor(42)
+    assert actor3.actor_full_name is None
+
 def test_equality():
     actor1 = Actor("Taika Waititi")
     actor2 = Actor("")

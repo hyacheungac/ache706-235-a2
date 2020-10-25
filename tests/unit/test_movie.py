@@ -1,6 +1,38 @@
 from CS235Flix.domainmodel.movie import Movie, Genre, Actor, Director
 
 
+def test_init():
+    movie1 = Movie("Moana", 2000)
+    movie2 = Movie("Moana", None)
+    movie3 = Movie("Moana", 1000)
+    movie4 = Movie("Moana", "test")
+    movie5 = Movie(" Moana", 2000)
+    movie6 = Movie("  Moana", 2000)
+    movie7 = Movie("Moana ", 2000)
+    movie8 = Movie("Moana  ", 2000)
+    movie9 = Movie(" Moana ", 2000)
+    movie10 = Movie("  Moana  ", 2000)
+
+    assert repr(movie1) == "<Movie Moana, 2000>"
+    assert repr(movie2) == "<Movie Moana, None>"
+    assert repr(movie3) == "<Movie Moana, None>"
+    assert repr(movie4) == "<Movie Moana, None>"
+    assert repr(movie5) == "<Movie Moana, 2000>"
+    assert repr(movie6) == "<Movie Moana, 2000>"
+    assert repr(movie7) == "<Movie Moana, 2000>"
+    assert repr(movie8) == "<Movie Moana, 2000>"
+    assert repr(movie9) == "<Movie Moana, 2000>"
+    assert repr(movie10) == "<Movie Moana, 2000>"
+
+    movie1 = Movie(None, 2000)
+    movie2 = Movie("", 2000)
+    movie3 = Movie(3, 2000)
+
+    assert repr(movie1) == "<Movie None, 2000>"
+    assert repr(movie2) == "<Movie None, 2000>"
+    assert repr(movie3) == "<Movie None, 2000>"
+
+
 def test_equality():
     movie1 = Movie("Moana", 2000)
     movie2 = Movie("Moana", 2001)
@@ -74,6 +106,25 @@ def test_director():
     assert movie1.director == Director("Ron Clements")
     movie1.director = Director("Rob Clements")
     assert movie1.director == Director("Rob Clements")
+
+def test_actors():
+    movie1 = Movie("Moana", 2000)
+    actors = [Actor("Auli'i Cravalho"), Actor("Dwayne Johnson")]
+    assert movie1.actors == set()
+    movie1.add_actor(actors[0])
+    assert movie1.actors == set([Actor("Auli'i Cravalho")])
+    movie1.add_actor(actors[1])
+    assert movie1.actors == set([Actor("Auli'i Cravalho"), Actor("Dwayne Johnson")])
+    movie1.add_actor(actors[1])
+    assert movie1.actors == set([Actor("Auli'i Cravalho"), Actor("Dwayne Johnson")])
+    movie1.remove_actor(actors[1])
+    assert movie1.actors == set([Actor("Auli'i Cravalho")])
+    movie1.remove_actor(actors[1])
+    assert movie1.actors == set([Actor("Auli'i Cravalho")])
+    movie1.remove_actor(actors[0])
+    assert movie1.actors == set()
+    movie1.remove_actor(actors[0])
+    assert movie1.actors == set()
 
 def test_genres():
     movie1 = Movie("Moana", 2000)
