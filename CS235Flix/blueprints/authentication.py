@@ -1,16 +1,14 @@
 from flask import Blueprint, render_template, redirect, url_for, session, request
 
+from functools import wraps
 from flask_wtf import FlaskForm
+from password_validator import PasswordValidator
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, ValidationError
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from password_validator import PasswordValidator
-
-from functools import wraps
-
-import covid.utilities.utilities as utilities
-import covid.authentication.services as services
-import covid.adapters.repository as repo
+from CS235Flix.domainmodel.user import User
+import CS235Flix.adapters.repository as repo
 
 # Configure Blueprint.
 authentication_blueprint = Blueprint(
@@ -20,68 +18,64 @@ authentication_blueprint = Blueprint(
 @authentication_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    username_not_unique = None
+    error = None
 
     if form.validate_on_submit():
-        # Successful POST, i.e. the username and password have passed validation checking.
-        # Use the service layer to attempt to add the new user.
-        try:
-            services.add_user(form.username.data, form.password.data, repo.repo_instance)
+        # Successful POST, username and password valid.
+        password = generate_password_hash(form.password.data)
+        user = User(form.username.data, password)
+        unique_username = repo.repo_instance.add_user(user)
 
-            # All is well, redirect the user to the login page.
-            return redirect(url_for('authentication_bp.login'))
-        except services.NameNotUniqueException:
-            username_not_unique = 'Your username is already taken - please supply another'
+        if unique_username:
+            session.clear()
+            session['username'] = user.username
+            return redirect(url_for('index_bp.index'))
+
+        else:
+            error = 'Your username is already taken - please supply another'
 
     # For a GET or a failed POST request, return the Registration Web page.
     return render_template(
-        'authentication/credentials.html',
+        'credentials.html',
         title='Register',
         form=form,
-        username_error_message=username_not_unique,
+        username_error_message=error,
+        password_error_message=None,
         handler_url=url_for('authentication_bp.register'),
-        selected_articles=utilities.get_selected_articles(),
-        tag_urls=utilities.get_tags_and_urls()
     )
-
 
 @authentication_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    username_not_recognised = None
-    password_does_not_match_username = None
+    username_error = None
+    password_error = None
 
     if form.validate_on_submit():
-        # Successful POST, i.e. the username and password have passed validation checking.
-        # Use the service layer to lookup the user.
+        # Successful POST, username and password valid
         try:
-            user = services.get_user(form.username.data, repo.repo_instance)
+            user = repo.repo_instance.get_user(form.username.data)
+            if not user:
+                username_error = "Username not recognised - please supply another"
 
-            # Authenticate user.
-            services.authenticate_user(user['username'], form.password.data, repo.repo_instance)
+            valid = check_password_hash(user.password, form.password.data)
+            if user and not valid:
+                password_error = "Invalid password - please try again"
 
             # Initialise session and redirect the user to the home page.
-            session.clear()
-            session['username'] = user['username']
-            return redirect(url_for('home_bp.home'))
-
-        except services.UnknownUserException:
-            # Username not known to the system, set a suitable error message.
-            username_not_recognised = 'Username not recognised - please supply another'
-
-        except services.AuthenticationException:
-            # Authentication failed, set a suitable error message.
-            password_does_not_match_username = 'Password does not match supplied username - please check and try again'
+            if user and valid:
+                session.clear()
+                session['username'] = user.username
+                return redirect(url_for('index_bp.index'))
+        except:
+            pass
 
     # For a GET or a failed POST, return the Login Web page.
     return render_template(
-        'authentication/credentials.html',
+        'credentials.html',
         title='Login',
-        username_error_message=username_not_recognised,
-        password_error_message=password_does_not_match_username,
+        username_error_message=username_error,
+        password_error_message=password_error,
         form=form,
-        selected_articles=utilities.get_selected_articles(),
-        tag_urls=utilities.get_tags_and_urls()
     )
 
 

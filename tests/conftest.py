@@ -4,7 +4,7 @@ import pytest
 from CS235Flix.adapters.memory_repository import MemoryRepository, populate
 from CS235Flix import create_app
 
-test_dir = os.path.dirname(__file__)
+test_dir = "C:/Users/85251/Downloads/COMPSCI notes (AucklandUni)/COMPSCI 235/A2/ache706-235-a2/tests"
 TEST_DATA_PATH = os.path.join(test_dir, "data")
 TEST_DATA_PATH2 = os.path.join(test_dir, "data2")
 

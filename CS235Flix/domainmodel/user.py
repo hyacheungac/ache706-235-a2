@@ -1,6 +1,3 @@
-from CS235Flix.domainmodel.movie import Movie
-from CS235Flix.domainmodel.review import Review
-
 class User:
     def __init__(self, user, pwd):
         self.__user = None
@@ -53,3 +50,7 @@ class User:
     def add_review(self, review):
         if review not in self.__reviews:
             self.__reviews.append(review)
+
+    def remove_review(self, review):
+        if review in self.__reviews:
+            self.__reviews.remove(review)

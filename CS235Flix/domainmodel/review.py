@@ -49,3 +49,11 @@ class Review:
 
     def __eq__(self, other):
         return (str(self.movie) + str(self.review_text) + str(self.rating) + str(self.timestamp)) == (str(other.movie) + str(other.review_text) + str(other.rating) + str(other.timestamp))
+
+    def __hash__(self):
+        return hash(self.__timestamp)
+
+    def edit(self, text, rating):
+        self.__review_text = text
+        self.__rating = rating
+        self.__timestamp = datetime.date.today()

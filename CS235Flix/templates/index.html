@@ -1,0 +1,41 @@
+{% extends 'layout.html' %} {% block content %}
+<h1>Recently added</h1>
+
+{% for movie in movies %}
+  <section class="movie">
+    <a href="movie/{{ movie.media_id }}">
+    <!-- this is where the movie poster would go -->
+    <div>
+      <h2>{{ movie.title }} ({{ movie.release_year }})</h2>
+      <p>Directed by: {{ movie.director.full_name }}</p>
+      <p>Starring: {% for actor in movie.actors %}
+        {{ actor.full_name }}{% if not loop.last %}, {% endif %}
+      {% endfor %}</p>
+      <p>{% for genre in movie.genres %}
+        {{ genre.genre_name }}{% if not loop.last %}, {% endif %}
+      {% endfor %}</p>
+      <br/>
+      <p>{{ movie.description }}</p>
+    </div>
+    </a>
+  </section>
+{% endfor %}
+
+<section class="spaced">
+  {% if url_previous >= 0 %}
+    {% if url_previous == 0 %}
+      <a href="/"><button>Previous</button></a>
+    {% else %}
+      <a href="/?n={{ url_previous }}"><button>Previous</button></a>
+    {% endif %}
+
+  <!-- ensure 'next' ends up on the right even if there is no previous button -->
+  {% else %}
+    <div></div>
+  {% endif %}
+
+  {% if url_next %}
+    <a href="/?n={{ url_next }}"><button>Next</button></a>
+  {% endif %}
+</section>
+{% endblock %}

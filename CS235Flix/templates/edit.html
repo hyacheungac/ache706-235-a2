@@ -1,0 +1,38 @@
+
+{% extends 'layout.html' %} {% block content %}
+
+<h2 style="margin-block-end: 0;">Original Review:</h2>
+<div class="review">
+  <div class="spaced">
+    <p>{{review.user.username}}</p>
+    <p>{{review.rating}} / 10</p>
+    <p>{{review.timestamp.date()}}</p>
+  </div>
+  <p>{{review.review_text}}</p>
+</div>
+
+<h2 style="margin-block-end: 0;">Replace with:</h2>
+<form class="review-form" method="POST" action="{{ handler_url }}">
+  {{ form.csrf_token }}
+
+  <div class="form-field">
+    {{ form.text }}
+  </div>
+
+  <select name="rating" required>
+    <option value="" selected disabled hidden>Rating</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+  </select>
+
+  {{ form.submit }}
+</form>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'layout.html' %} {% block content %}
+
+<h1>{{ movie.title }} ({{ movie.release_year }})</h1>
+<p>Directed by: {{ movie.director.full_name }}</p>
+<p>Starring: {% for actor in movie.actors %}
+  {{ actor.full_name }}{% if not loop.last %}, {% endif %}
+{% endfor %}</p>
+<p>{% for genre in movie.genres %}
+  {{ genre.genre_name }}{% if not loop.last %}, {% endif %}
+{% endfor %}</p>
+<br/>
+<p>{{ movie.description }}</p>
+
+<br/>
+<h2 style="margin-block-end: 0;">Reviews</h2>
+{% if "username" in session %}
+  <form class="review-form" method="POST" action="{{ handler_url }}">
+    {{ form.csrf_token }}
+
+    <div class="form-field">
+      {{ form.text }}
+    </div>
+
+    <select name="rating" required>
+      <option value="" selected disabled hidden>Rating</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+    </select>
+
+    {{ form.submit }}
+  </form>
+{% else %}
+  <p>Login to write your own review!</p><br/>
+{% endif %}
+
+
+{% if reviews == [] %}
+  <p>{{ movie.title }} has not received any reviews yet!</p>
+{% else %}
+  {% for review in reviews %}
+    <div class="review">
+      <div class="spaced">
+        <p>{{review.user.username}}</p>
+        <p>{{review.rating}} / 10</p>
+        <p>{{review.timestamp.date()}}</p>
+      </div>
+      <p>{{review.review_text}}</p>
+
+      {% if "username" in session %}
+        {% if review.user.username == session["username"] %}
+          <footer>
+            <a href="/edit/{{review.hash}}">edit</a>
+            <a href="/delete/{{review.hash}}">delete</a>
+          </footer>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% endfor %}
+{% endif %}
+{% endblock %}

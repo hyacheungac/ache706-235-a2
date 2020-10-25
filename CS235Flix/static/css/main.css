@@ -1,0 +1,224 @@
+body {
+  background-color: #f59b52;
+}
+
+.spaced {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header {
+  padding: 20px 3vh;
+}
+
+#logo {
+  height: 6vh;
+  width: auto;
+}
+
+#nav-open {
+  padding-right: 2vh;
+  height: 2vh;
+}
+
+#nav-open:hover, #nav-open:focus {
+  height: 2.1vh;
+}
+
+
+nav {
+  position: absolute;
+  display: none;
+  right: 5vh;
+  top: 20px;
+  overflow-y: hidden;
+  overflow-x: visible;
+  z-index: 999;
+  background: #eb1212;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  min-height: 100%;
+}
+
+nav a {
+  display: block;
+  padding: .1em 15px;
+  font-size: 1.5em;
+  color: #fd5959;
+  text-decoration: none;
+}
+
+nav span a {
+  font-size: 2em;
+  padding-top: 0.5em;
+  text-decoration: none;
+}
+
+nav p {
+  color: #fd5959;
+  text-decoration: none;
+  display: block;
+  padding: .1em 15px;
+  font-size: 1.5em;
+}
+
+nav a:hover, nav a:focus {
+  color: #e22828;
+  text-decoration: underline;
+}
+
+nav span a:hover, nav span a:focus {
+  text-decoration: none;
+}
+
+nav .nav-close {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+
+/* make nav display when opened */
+nav:target {
+  display: block;
+  box-shadow: 3px 0 12px rgba(0,0,0,1);
+}
+
+nav:target .nav-close {
+  z-index: 1001;
+}
+
+nav:target ul {
+  position: relative;
+  z-index: 1000;
+}
+
+/* change style of backdrop when nav is open */
+nav:target + .backdrop {
+  position: absolute;
+  display: block;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 998;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* make sure it works on iOS */
+@supports (position: fixed) {
+  nav, nav:target + .backdrop {
+    position: fixed;
+  }
+}
+
+form {
+  margin: 3vh 100px 0 10px;
+  display: flex;
+}
+
+form div {
+  width: 100%;
+  page-break-after: always;
+}
+
+form input {
+  font-size: 17px;
+  padding: 6px;
+  border: none;
+}
+
+form button {
+  float: right;
+  font-size: 17px;
+  padding: 6px 10px;
+  border: none;
+  background: #ddd;
+  cursor: pointer;
+}
+
+form button:hover {
+  background: #ccc;
+}
+
+#content {
+  width: 70vw;
+  margin: 0 auto;
+  color: white;
+}
+
+.movie {
+  border-top: 1px solid white;
+  height: 4vh;
+  overflow: hidden;
+}
+
+.movie:hover {
+  height: auto;
+}
+
+.movie * {
+  text-decoration: none !important;
+  color: white;
+}
+
+.movie h2 {
+  margin: 1vh auto 0 auto;
+}
+
+.movie p {
+  margin: 0;
+}
+
+.movie p:last-child {
+  margin-bottom: 1vh;
+}
+
+#content .movie:last-child {
+  height: auto !important;
+}
+
+.review {
+  border: 1px solid white;
+  width: 90%;
+  padding: 0 30px;
+  margin: 0 auto;
+}
+
+.review p {
+  margin: 10px 0;
+}
+
+.review-form {
+  width: 80%;
+  display: flex;
+  margin: 2vh auto;
+}
+
+.review-form input[type=text] {
+  width: 90%;
+}
+
+.review-form select {
+  margin: 0 20px;
+}
+
+.review footer {
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+.review footer a {
+  color: #fd5959;
+  text-decoration: none !important;
+  margin-right: 20px;
+}
+
+.review footer a:hover {
+  color: #fd5959;
+  text-decoration: underline;
+}

@@ -1,0 +1,57 @@
+{% extends 'layout.html' %} {% block content %}
+
+<form action="/search" autocomplete="off" class="search">
+    <input type="text" value="{{ query }}" name="q" required>
+    <select name="filter">
+      <option value="all" {% if filter == "all" %}selected{% endif %}>All</option>
+      <option value="title" {% if filter == "title" %}selected{% endif %}>Movie titles</option>
+      <option value="actor" {% if filter == "actor" %}selected{% endif %}>Actors</option>
+      <option value="genre" {% if filter == "genre" %}selected{% endif %}>Genres</option>
+      <option value="director" {% if filter == "director" %}selected{% endif %}>Directors</option>
+    </select>
+    <button type="submit">&#128269</button>
+</form>
+
+<p>
+  {{ num_results }} result{% if num_results != 1 %}s{% endif %} found.
+  Viewing page {{ page }} of {{ pages }}
+</p>
+
+{% for movie in movies %}
+  <section class="movie">
+    <a href="movie/{{ movie.media_id }}">
+    <!-- this is where the movie poster would go -->
+    <div>
+      <h2>{{ movie.title }} ({{ movie.release_year }})</h2>
+      <p>Directed by: {{ movie.director.full_name }}</p>
+      <p>Starring: {% for actor in movie.actors %}
+        {{ actor.full_name }}{% if not loop.last %}, {% endif %}
+      {% endfor %}</p>
+      <p>{% for genre in movie.genres %}
+        {{ genre.genre_name }}{% if not loop.last %}, {% endif %}
+      {% endfor %}</p>
+      <br/>
+      <p>{{ movie.description }}</p>
+    </div>
+    </a>
+  </section>
+{% endfor %}
+
+<section class="spaced">
+  {% if url_previous >= 0 %}
+    {% if url_previous == 0 %}
+      <a href="/search?q={{query}}&filter={{filter}}"><button>Previous</button></a>
+    {% else %}
+      <a href="/search?q={{query}}&filter={{filter}}&n={{ url_previous }}"><button>Previous</button></a>
+    {% endif %}
+
+  <!-- ensure 'next' ends up on the right even if there is no previous button -->
+  {% else %}
+    <div></div>
+  {% endif %}
+
+  {% if url_next %}
+    <a href="/search?q={{query}}&filter={{filter}}&n={{ url_next }}"><button>Next</button></a>
+  {% endif %}
+</section>
+{% endblock %}
