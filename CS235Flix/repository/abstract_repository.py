@@ -1,9 +1,12 @@
 import abc
 
+
 repo_instance = None
+
 
 class RepositoryException(Exception):
     pass
+
 
 class AbstractRepository(abc.ABC):
     @abc.abstractmethod
@@ -15,39 +18,39 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def add_movie(self, user):
+    def add_media(self, user):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_movie(self, movie_id):
+    def get_media(self, media_id):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_movie_by_title(self, title):
+    def get_media_by_title(self, title):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_movie_count(self):
+    def get_media_count(self):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_movie_by_actor(self, actor):
+    def get_media_by_actor(self, actor):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_movie_by_genre(self, genre):
+    def get_media_by_genre(self, genre):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_movie_by_director(self, director):
+    def get_media_by_director(self, director):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_movie_by_year(self, year):
+    def get_media_by_year(self, year):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_movie_since_year(self, year):
+    def get_media_since_year(self, year):
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -55,7 +58,7 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_reviews_by_movie(self, movie_id):
+    def get_reviews_by_media(self, media_id):
         raise NotImplementedError
 
     @abc.abstractmethod
