@@ -17,19 +17,17 @@
   <body>
     <header class="spaced">
       <a href="/">
-        <img id="logo" src="{{ url_for('static', filename='logo.svg') }}"  alt="Logo"/>
+        <img id="logo" src="{{ url_for('static', filename='icon.png') }}" />
       </a>
 
       <a href="#nav">
-        <img id="nav-open" src="{{ url_for('static', filename='nav-open.svg') }}"  alt="Open icon"/>
+        <img id="nav-open" src="{{ url_for('static', filename='open_list.svg') }}" />
       </a>
 
       <nav id="nav">
         <span class="spaced">
           <form action="/search" autocomplete="off" class="search">
-              <label>
-                <input type="text" placeholder="Search.." name="q" required>
-              </label>
+              <input type="text" placeholder="Search.." name="q" required>
               <button type="submit">&#128269</button>
           </form>
           <a href="#" class="nav-close"> x </a>

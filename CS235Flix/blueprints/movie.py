@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField
 from wtforms.validators import DataRequired, NumberRange
 
-import CS235Flix.adapters.repository as repo
+import CS235Flix.repository.abstract_repository as repo
 from CS235Flix.domainmodel.review import Review
 
 

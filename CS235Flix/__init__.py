@@ -33,7 +33,7 @@ def create_app(test_config=None):
     # Build the application
     with app.app_context():
         from CS235Flix.blueprints import movie, authentication, review
-        from CS235Flix.templates import index
+        from CS235Flix.blueprints import index
         app.register_blueprint(index.index_blueprint)
         app.register_blueprint(movie.movie_blueprint)
         # app.register_blueprint(search.search_blueprint)

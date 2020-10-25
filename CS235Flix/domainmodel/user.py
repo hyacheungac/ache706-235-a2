@@ -1,30 +1,20 @@
-class User:
-    def __init__(self, user, pwd):
-        self.__user = None
-        if user and type(user) == str: self.__user = user.strip().lower()
-        if pwd and type(pwd) is str:
-            self.__password = pwd
-        else:
-            self.__password = None
+# from CS235Flix.domainmodel.movie import Movie
+# from CS235Flix.domainmodel.review import Review
+from CS235Flix.domainmodel.person import Person
+
+class User(Person):
+    def __init__(self, usr, pwd):
+        usr = usr.strip().lower() if usr and type(usr) is str else None
+        super().__init__(usr)
+
+        self.__password = pwd if pwd and type(pwd) is str else None
         self.__watched_movies = []
         self.__reviews = []
         self.__time_spent_watching_movies_minutes = 0
 
-    def __repr__(self):
-        return f"<User {self.__user}>"
-
-    def __eq__(self, other):
-        return self.__user == other.__user
-
-    def __lt__(self, other):
-        return self.__user < other.__user
-
-    def __hash__(self):
-        return hash(self.__user)
-
     @property
-    def user_name(self):
-        return self.__user
+    def username(self):
+        return self.full_name
 
     @property
     def password(self):
@@ -42,6 +32,7 @@ class User:
     def time_spent_watching_movies_minutes(self):
         return self.__time_spent_watching_movies_minutes
 
+
     def watch_movie(self, movie):
         if movie not in self.__watched_movies:
             self.__watched_movies.append(movie)
@@ -54,3 +45,8 @@ class User:
     def remove_review(self, review):
         if review in self.__reviews:
             self.__reviews.remove(review)
+
+
+
+
+

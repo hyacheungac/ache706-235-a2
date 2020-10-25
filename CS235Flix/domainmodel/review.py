@@ -1,27 +1,19 @@
-import datetime
+from datetime import datetime
 
 from CS235Flix.domainmodel.movie import Movie
-from CS235Flix.domainmodel.user import User
 
 class Review:
     def __init__(self, movie, user, review_text, rating):
-        if movie and type(movie) == Movie:
-            self.__movie = movie
-        else:
-            self.__movie = None
-        if user and type(user) == User:
-            self.__user = user
-        else:
-            self.__user = None
-        if review_text and type(review_text) is str:
-            self.__review_text = review_text.strip()
-        else:
-            self.__review_text = None
-        if rating and type(rating) is int and 0 < rating < 11:
-            self.__rating = rating
-        else:
-            self.__rating = None
-        self.__timestamp = datetime.date.today()
+        self.__movie = movie if movie and type(movie) is Movie else None
+
+        self.__review_text = (review_text if review_text and
+                              type(review_text) is str else None)
+
+        self.__rating = (rating if type(rating) is int and
+                         1 <= rating <= 10 else None)
+
+        self.__timestamp = datetime.today()
+        self.__user = user
 
 
     @property
@@ -31,6 +23,10 @@ class Review:
     @property
     def user(self):
         return self.__user
+
+    @property
+    def hash(self):
+        return hash(self)
 
     @property
     def review_text(self):
@@ -44,11 +40,15 @@ class Review:
     def timestamp(self):
         return self.__timestamp
 
+
     def __repr__(self):
         return f"<Review {repr(self.__movie)}, {self.__timestamp}>"
 
     def __eq__(self, other):
-        return (str(self.movie) + str(self.review_text) + str(self.rating) + str(self.timestamp)) == (str(other.movie) + str(other.review_text) + str(other.rating) + str(other.timestamp))
+        return (self.movie == other.movie
+                and self.review_text == other.review_text
+                and self.rating == other.rating
+                and self.timestamp == other.timestamp)
 
     def __hash__(self):
         return hash(self.__timestamp)
@@ -56,4 +56,5 @@ class Review:
     def edit(self, text, rating):
         self.__review_text = text
         self.__rating = rating
-        self.__timestamp = datetime.date.today()
+        self.__timestamp = datetime.today()
+
