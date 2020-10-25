@@ -4,42 +4,41 @@ import os
 
 from flask import Flask
 
-import CS235Flix.adapters.repository as repo
-from CS235Flix.adapters.memory_repository import MemoryRepository, populate
+try:
+    from domainmodel.person import Person
+except ImportError:
+    # allow importing from the src directory
+    import sys
+    sys.path.append("src")
+
+import repository.abstract_repository as repo
+from repository.memory_repository import MemoryRepository, populate
 
 
 def create_app(test_config=None):
-    """Construct the core application."""
-
-    # Create the Flask app object.
     app = Flask(__name__)
 
-    # Configure the app from configuration-file settings.
     app.config.from_object('config.Config')
-    data_path = os.path.join('covid', 'adapters', 'data')
+    data_path = os.path.join('src', 'repository', 'datafiles')
 
     if test_config is not None:
-        # Load test configuration, and overrride any configuration settings.
         app.config.from_mapping(test_config)
         data_path = app.config['TEST_DATA_PATH']
 
-    # Create the MemoryRepository implementation for a memory-based repository.
     repo.repo_instance = MemoryRepository()
     populate(data_path, repo.repo_instance)
 
-    # Build the application - these steps require an application context.
+    # Build the application
     with app.app_context():
-        # Register blueprints.
-        from .home import home
-        app.register_blueprint(home.home_blueprint)
+        # @app.errorhandler(404)
+        # def page_not_found(e):
+        #     return render_template('404.html'), 404
 
-        from .news import news
-        app.register_blueprint(news.news_blueprint)
-
-        from CS235Flix.authentication import authentication
+        from blueprints import index, movie, search, authentication, review
+        app.register_blueprint(index.index_blueprint)
+        app.register_blueprint(movie.movie_blueprint)
+        app.register_blueprint(search.search_blueprint)
+        app.register_blueprint(review.review_blueprint)
         app.register_blueprint(authentication.authentication_blueprint)
-
-        from .utilities import utilities
-        app.register_blueprint(utilities.utilities_blueprint)
 
     return app
